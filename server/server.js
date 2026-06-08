@@ -8,6 +8,12 @@ const http = require('http');
 
 // 创建HTTP服务器
 const server = http.createServer((req, res) => {
+  // 健康检查接口
+  if (req.url === '/health') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: 'ok', rooms: rooms.size, players: players.size, uptime: process.uptime() }));
+    return;
+  }
   res.writeHead(200, { 'Content-Type': 'text/plain' });
   res.end('五子棋WebSocket服务器运行中');
 });
