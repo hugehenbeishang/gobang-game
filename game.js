@@ -62,33 +62,50 @@ function connectWebSocket() {
       return;
     }
 
-    wx.showLoading({ title: '连接服务器中...' });
+    game.intentionalClose = false;
 
     game.ws = wx.connectSocket({
       url: WS_URL,
       header: {},
       protocols: [],
-      success: () => console.log('连接中...'),
+      success: () => {
+        console.log('连接请求已发送...');
+      },
       fail: (err) => {
-        wx.hideLoading();
-        console.error('连接失败:', err);
-        wx.showToast({ title: '连接失败，点击重试', icon: 'none', duration: 3000 });
+        console.error('连接请求失败:', err);
+        game.connected = false;
+        drawBoard();
         reject(err);
       }
     });
 
+    // 设置连接超时
+    const connectTimer = setTimeout(() => {
+      if (!game.connected) {
+        console.log('连接超时，关闭连接');
+        if (game.ws) {
+          game.intentionalClose = true;
+          wx.closeSocket();
+        }
+        game.connected = false;
+        drawBoard();
+        reject(new Error('连接超时'));
+      }
+    }, 15000);
+
     game.ws.onOpen(() => {
+      clearTimeout(connectTimer);
       console.log('WebSocket连接成功');
       game.connected = true;
-      wx.hideLoading();
-      drawBoard(); // 更新界面连接状态
+      drawBoard();
       resolve();
     });
 
     game.ws.onClose(() => {
+      clearTimeout(connectTimer);
       console.log('WebSocket连接关闭');
       game.connected = false;
-      drawBoard(); // 更新界面连接状态
+      drawBoard();
       // 非主动关闭时尝试重连
       if (!game.intentionalClose) {
         setTimeout(() => {
@@ -101,10 +118,10 @@ function connectWebSocket() {
     });
 
     game.ws.onError((err) => {
+      clearTimeout(connectTimer);
       console.error('WebSocket错误:', err);
       game.connected = false;
-      wx.hideLoading();
-      drawBoard(); // 更新界面连接状态
+      drawBoard();
       reject(err);
     });
 

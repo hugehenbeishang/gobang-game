@@ -676,7 +676,8 @@ function broadcastToRoom(roomId, message) {
 
 // 启动服务器
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
+const HOST = '0.0.0.0';
+server.listen(PORT, HOST, () => {
   console.log(`五子棋WebSocket服务器运行在端口 ${PORT}`);
   console.log(`访问地址: http://localhost:${PORT}`);
 });
