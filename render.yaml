@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: gobang-server
+    runtime: node
+    repo: https://github.com/hugehenbeishang/gobang-game
+    branch: main
+    rootDir: server
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
