@@ -1,0 +1,256 @@
+/**game.wxss**/
+.game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  padding: 20rpx;
+}
+
+/* 游戏信息栏 */
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 700rpx;
+  padding: 20rpx;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 15rpx;
+  margin-bottom: 30rpx;
+}
+
+.player-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15rpx;
+  border-radius: 10rpx;
+  transition: all 0.3s ease;
+}
+
+.player-info.active {
+  background-color: rgba(74, 144, 226, 0.3);
+  box-shadow: 0 0 15rpx rgba(74, 144, 226, 0.5);
+}
+
+.player-avatar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5rpx;
+}
+
+.player-name {
+  font-size: 28rpx;
+  color: #fff;
+  margin-left: 10rpx;
+  font-weight: bold;
+}
+
+.player-status {
+  font-size: 22rpx;
+  color: #4a90e2;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+.game-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.status-text {
+  font-size: 32rpx;
+  color: #fff;
+  font-weight: bold;
+  margin-bottom: 5rpx;
+}
+
+.turn-info {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* 棋盘区域 */
+.board-wrapper {
+  position: relative;
+  width: 700rpx;
+  height: 700rpx;
+  background: linear-gradient(135deg, #d4a373 0%, #ccd5ae 100%);
+  border-radius: 15rpx;
+  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.3);
+  margin-bottom: 30rpx;
+  overflow: hidden;
+}
+
+.board-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.move-hint {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* 棋子样式 */
+.chess-piece {
+  border-radius: 50%;
+}
+
+.chess-piece.black {
+  background: radial-gradient(circle at 30% 30%, #555, #000);
+  box-shadow: 2rpx 2rpx 4rpx rgba(0, 0, 0, 0.5);
+}
+
+.chess-piece.white {
+  background: radial-gradient(circle at 30% 30%, #fff, #ddd);
+  border: 2rpx solid #ccc;
+  box-shadow: 2rpx 2rpx 4rpx rgba(0, 0, 0, 0.2);
+}
+
+.chess-piece.small {
+  width: 40rpx;
+  height: 40rpx;
+}
+
+.chess-piece.hint {
+  width: 50rpx;
+  height: 50rpx;
+  opacity: 0.6;
+  animation: hintPulse 1s infinite;
+}
+
+@keyframes hintPulse {
+  0% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 0.6; }
+}
+
+/* 游戏控制栏 */
+.game-controls {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  max-width: 700rpx;
+  padding: 20rpx;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 15rpx;
+}
+
+.control-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 150rpx;
+  height: 120rpx;
+  background-color: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 10rpx;
+  color: #fff;
+  transition: all 0.2s ease;
+}
+
+.control-btn:active {
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: scale(0.95);
+}
+
+.control-btn:disabled {
+  opacity: 0.5;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.btn-icon {
+  font-size: 36rpx;
+  margin-bottom: 5rpx;
+}
+
+.btn-text {
+  font-size: 24rpx;
+}
+
+/* 游戏结束弹窗 */
+.game-over-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-content {
+  width: 80%;
+  max-width: 600rpx;
+  background-color: #fff;
+  border-radius: 20rpx;
+  padding: 40rpx;
+  text-align: center;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(50rpx); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-title {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.modal-message {
+  font-size: 32rpx;
+  color: #666;
+  margin-bottom: 40rpx;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-around;
+}
+
+.modal-btn {
+  width: 200rpx;
+  height: 80rpx;
+  border-radius: 10rpx;
+  font-size: 30rpx;
+  font-weight: bold;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-btn.primary {
+  background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+  color: #fff;
+}
+
+.modal-btn.secondary {
+  background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+  color: #fff;
+}

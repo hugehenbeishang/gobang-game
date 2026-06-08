@@ -1,0 +1,79 @@
+<!--pages/index/index.wxml-->
+<view class="container">
+  <!-- 欢迎区域 -->
+  <view class="welcome-section">
+    <image class="logo" src="/images/logo.svg" mode="aspectFit"></image>
+    <view class="title">五子棋对战</view>
+    <view class="subtitle">与好友实时对弈</view>
+  </view>
+
+  <!-- 用户信息区域 -->
+  <view class="user-section" wx:if="{{isLoggedIn}}">
+    <view class="user-info">
+      <image class="avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+      <view class="nickname">{{userInfo.nickName}}</view>
+    </view>
+    <button class="btn btn-secondary" bindtap="logout">退出登录</button>
+  </view>
+
+  <!-- 未登录状态 -->
+  <view class="login-section" wx:else>
+    <button class="btn btn-primary" bindtap="login">微信登录</button>
+    <view class="login-hint">登录后可创建房间与好友对战</view>
+  </view>
+
+  <!-- 游戏功能区域 -->
+  <view class="game-section" wx:if="{{isLoggedIn}}">
+    <!-- 创建房间 -->
+    <view class="card">
+      <view class="card-title">创建房间</view>
+      <view class="card-content">
+        <view class="form-item">
+          <text class="label">房间名称</text>
+          <input class="input" placeholder="输入房间名称" value="{{roomName}}" bindinput="onRoomNameInput"/>
+        </view>
+        <view class="form-item">
+          <text class="label">选择棋色</text>
+          <view class="color-picker">
+            <view class="color-option {{selectedColor === 'black' ? 'selected' : ''}}" 
+                  bindtap="selectColor" data-color="black">
+              <view class="chess-piece black"></view>
+              <text>执黑先行</text>
+            </view>
+            <view class="color-option {{selectedColor === 'white' ? 'selected' : ''}}" 
+                  bindtap="selectColor" data-color="white">
+              <view class="chess-piece white"></view>
+              <text>执白后行</text>
+            </view>
+          </view>
+        </view>
+        <button class="btn btn-success" bindtap="createRoom">创建房间</button>
+      </view>
+    </view>
+
+    <!-- 加入房间 -->
+    <view class="card">
+      <view class="card-title">加入房间</view>
+      <view class="card-content">
+        <view class="form-item">
+          <text class="label">房间号</text>
+          <input class="input" placeholder="输入房间号" value="{{roomCode}}" bindinput="onRoomCodeInput"/>
+        </view>
+        <button class="btn btn-primary" bindtap="joinRoom">加入房间</button>
+      </view>
+    </view>
+
+    <!-- 快速匹配 -->
+    <view class="card">
+      <view class="card-title">快速匹配</view>
+      <view class="card-content">
+        <button class="btn btn-warning" bindtap="quickMatch">随机匹配对手</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部信息 -->
+  <view class="footer">
+    <text class="footer-text">双人五子棋 v1.0</text>
+  </view>
+</view>

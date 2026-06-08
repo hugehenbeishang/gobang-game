@@ -1,0 +1,82 @@
+<!--pages/game/game.wxml-->
+<view class="game-container">
+  <!-- 游戏信息栏 -->
+  <view class="game-header">
+    <view class="player-info {{currentPlayer === 'black' ? 'active' : ''}}">
+      <view class="player-avatar">
+        <view class="chess-piece black small"></view>
+        <text class="player-name">{{blackPlayer.name || '黑方'}}</text>
+      </view>
+      <view class="player-status" wx:if="{{currentPlayer === 'black'}}">思考中...</view>
+    </view>
+    
+    <view class="game-status">
+      <text class="status-text">{{gameStatus}}</text>
+      <text class="turn-info">第 {{moveCount + 1}} 手</text>
+    </view>
+    
+    <view class="player-info {{currentPlayer === 'white' ? 'active' : ''}}">
+      <view class="player-avatar">
+        <view class="chess-piece white small"></view>
+        <text class="player-name">{{whitePlayer.name || '白方'}}</text>
+      </view>
+      <view class="player-status" wx:if="{{currentPlayer === 'white'}}">思考中...</view>
+    </view>
+  </view>
+
+  <!-- 棋盘区域 -->
+  <view class="board-wrapper">
+    <canvas 
+      class="board-canvas" 
+      id="boardCanvas"
+      canvas-id="boardCanvas"
+      bindtouchstart="onBoardTouch"
+      bindtouchmove="onBoardTouchMove"
+      bindtouchend="onBoardTouchEnd"
+    ></canvas>
+    
+    <!-- 落子提示 -->
+    <view class="move-hint" wx:if="{{showMoveHint}}" 
+          style="left: {{hintX}}rpx; top: {{hintY}}rpx;">
+      <view class="chess-piece {{currentPlayer}} hint"></view>
+    </view>
+  </view>
+
+  <!-- 游戏控制栏 -->
+  <view class="game-controls">
+    <button class="control-btn" bindtap="undoMove" disabled="{{moveCount === 0}}">
+      <text class="btn-icon">↩</text>
+      <text class="btn-text">悔棋</text>
+    </button>
+    
+    <button class="control-btn" bindtap="restartGame">
+      <text class="btn-icon">🔄</text>
+      <text class="btn-text">重新开始</text>
+    </button>
+    
+    <button class="control-btn" bindtap="surrender">
+      <text class="btn-icon">🏳</text>
+      <text class="btn-text">认输</text>
+    </button>
+    
+    <button class="control-btn" bindtap="shareGame">
+      <text class="btn-icon">📤</text>
+      <text class="btn-text">分享</text>
+    </button>
+  </view>
+
+  <!-- 游戏结束弹窗 -->
+  <view class="game-over-modal" wx:if="{{gameOver}}">
+    <view class="modal-content">
+      <view class="modal-title">{{winner ? '游戏结束' : '平局'}}</view>
+      <view class="modal-message">
+        <text wx:if="{{winner}}">{{winner.name}} 获胜！</text>
+        <text wx:else>棋盘已满，平局！</text>
+      </view>
+      <view class="modal-actions">
+        <button class="modal-btn primary" bindtap="restartGame">再来一局</button>
+        <button class="modal-btn secondary" bindtap="backToRoom">返回房间</button>
+      </view>
+    </view>
+  </view>
+</view>
