@@ -11,8 +11,8 @@ canvas.width = windowWidth * pixelRatio;
 canvas.height = windowHeight * pixelRatio;
 ctx.scale(pixelRatio, pixelRatio);
 
-// WebSocket服务器地址（需要替换为实际地址）
-const WS_URL = 'ws://localhost:3000';
+// WebSocket服务器地址
+const WS_URL = 'wss://gobang-server-oycu.onrender.com';
 
 // ==================== 游戏状态 ====================
 const game = {
