@@ -50,32 +50,61 @@ const game = {
 
   // 连接状态
   connected: false,
-  ws: null
+  ws: null,
+  intentionalClose: false
 };
 
 // ==================== WebSocket管理 ====================
 function connectWebSocket() {
   return new Promise((resolve, reject) => {
+    if (game.connected) {
+      resolve();
+      return;
+    }
+
+    wx.showLoading({ title: '连接服务器中...' });
+
     game.ws = wx.connectSocket({
       url: WS_URL,
+      header: {},
+      protocols: [],
       success: () => console.log('连接中...'),
-      fail: (err) => reject(err)
+      fail: (err) => {
+        wx.hideLoading();
+        console.error('连接失败:', err);
+        wx.showToast({ title: '连接失败，点击重试', icon: 'none', duration: 3000 });
+        reject(err);
+      }
     });
 
     game.ws.onOpen(() => {
       console.log('WebSocket连接成功');
       game.connected = true;
+      wx.hideLoading();
+      drawBoard(); // 更新界面连接状态
       resolve();
     });
 
     game.ws.onClose(() => {
       console.log('WebSocket连接关闭');
       game.connected = false;
+      drawBoard(); // 更新界面连接状态
+      // 非主动关闭时尝试重连
+      if (!game.intentionalClose) {
+        setTimeout(() => {
+          if (!game.connected) {
+            console.log('尝试重连...');
+            connectWebSocket().catch(() => {});
+          }
+        }, 5000);
+      }
     });
 
     game.ws.onError((err) => {
       console.error('WebSocket错误:', err);
       game.connected = false;
+      wx.hideLoading();
+      drawBoard(); // 更新界面连接状态
       reject(err);
     });
 
@@ -267,11 +296,16 @@ function drawMenu() {
   // 快速匹配按钮
   drawMenuButton(30, 380, '快速匹配', '#ffc107', '#333');
 
+  // 未连接时显示重连按钮
+  if (!game.connected) {
+    drawMenuButton(30, 450, '重新连接', '#dc3545');
+  }
+
   // 连接状态
   ctx.fillStyle = game.connected ? '#28a745' : '#dc3545';
   ctx.font = '12px Arial';
   ctx.textAlign = 'center';
-  ctx.fillText(game.connected ? '● 服务器已连接' : '● 服务器未连接', windowWidth / 2, windowHeight - 30);
+  ctx.fillText(game.connected ? '● 服务器已连接' : '● 服务器未连接 - 点击重新连接', windowWidth / 2, windowHeight - 30);
 }
 
 function drawMenuButton(x, y, text, color, textColor = '#fff') {
@@ -595,6 +629,14 @@ function handleMenuTouch(x, y) {
     quickMatch();
     return;
   }
+
+  // 重新连接（未连接时显示）
+  if (!game.connected && y >= 450 && y <= 500 && x >= 30 && x <= windowWidth - 30) {
+    connectWebSocket().catch(err => {
+      console.error('重连失败:', err);
+    });
+    return;
+  }
 }
 
 function handleLobbyTouch(x, y) {
@@ -725,23 +767,24 @@ wx.onShareAppMessage(() => ({
 }));
 
 // ==================== 启动 ====================
+// 先初始化并绘制界面（不等待连接）
+initBoard();
+drawBoard();
+
 // 检查启动参数（通过分享链接进入）
 const launchOptions = wx.getLaunchOptionsSync();
 if (launchOptions.query && launchOptions.query.room) {
   // 通过分享链接加入房间
-  game.scene = 'menu';
   connectWebSocket().then(() => {
     joinRoom(launchOptions.query.room);
   }).catch(err => {
     console.error('连接失败:', err);
+    wx.showToast({ title: '连接失败，请点击重试', icon: 'none', duration: 3000 });
   });
 } else {
-  // 正常启动
+  // 正常启动 - 后台连接服务器
   connectWebSocket().catch(err => {
     console.error('连接失败:', err);
+    // 界面已经显示了，用户可以点击重连
   });
 }
-
-// 初始化并绘制
-initBoard();
-drawBoard();
